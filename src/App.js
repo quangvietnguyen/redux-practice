@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Products from './components/Shop/Products';
 //import { uiActions } from './store/ui-slice';
 import Notification from './components/UI/Notification';
-import { sendCartData } from './store/cart-slice';
+import { fetchCartData, sendCartData } from './store/cart-action';
 let isInitial = true;
 
 function App() {
@@ -14,13 +14,20 @@ function App() {
   const showCart = useSelector(state => state.ui.cartIsVisible);
   const notification = useSelector(state => state.ui.notification);
 
+
+  useEffect(() => {
+    dispatch(fetchCartData())
+  },[dispatch]);
+
   useEffect(() => {
     if (isInitial){
       isInitial = false;
       return;
     }
-    dispatch(sendCartData(cart));
-  }, [cart,isInitial])
+    if (cart.changed) {
+      dispatch(sendCartData(cart));
+    }
+  }, [cart,dispatch])
   // useEffect(() => {
   //   const sendCartData = async () => {
   //     dispatch(uiActions.showNotification({
@@ -28,7 +35,7 @@ function App() {
   //       title: 'Sending...',
   //       message: 'Sending cart data!',
   //     }))
-  //     const response = await fetch('https://food-order-app-3b13d-default-rtdb.firebaseio.com/cart',{
+  //     const response = await fetch('https://food-order-app-3b13d-default-rtdb.firebaseio.com/cart.json',{
   //       method: 'PUT',
   //       body: JSON.stringify(cart),
   //     })
